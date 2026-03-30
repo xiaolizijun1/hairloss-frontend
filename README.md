@@ -1,70 +1,104 @@
-# Getting Started with Create React App
+# Hair Loss Risk Prediction — Full-Stack ML App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack machine learning web application that predicts hair loss risk based on user health and lifestyle inputs. Built with a React front-end, Flask REST API backend, and deployed to Vercel.
 
-## Available Scripts
+🔗 **Live Demo:** [hairloss-frontend.vercel.app](https://hairloss-frontend.vercel.app)
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React, HTML5, CSS3 |
+| Backend | Python, Flask, REST API |
+| ML Models | scikit-learn, XGBoost, Pandas |
+| Deployment | Vercel (frontend), Render (backend) |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## Project Structure
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+hairloss-backend/
+├── app.py                  # Flask REST API entry point
+├── best_model.joblib       # Trained XGBoost model (serialized)
+├── model_meta.joblib       # Preprocessing metadata & encoders
+├── feature_schema.json     # Input feature schema for validation
+├── models/                 # Model training experiments
+└── requirements.txt
 
-### `npm run build`
+hairloss-frontend/
+├── src/
+│   ├── App.js              # Main React component
+│   └── ...                 # UI components & form logic
+└── package.json
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ML Pipeline
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Models Compared
+Three classifiers were trained and evaluated on the same dataset:
 
-### `npm run eject`
+| Model | Notes |
+|-------|-------|
+| Decision Tree | Baseline interpretable model |
+| Random Forest | Ensemble baseline |
+| **XGBoost** | **Best F1-score — selected for production** |
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Feature Engineering
+- **Age grouping:** binned continuous age into categorical risk brackets
+- **Stress-level encoding:** ordinal encoding of self-reported stress levels
+- **Lifestyle factors:** diet, sleep, physical activity encoded as categorical features
+- **Stratified train/test split** (70/30) to preserve class distribution
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Evaluation
+- Primary metric: **F1-score** (balances precision and recall for imbalanced classes)
+- Secondary: Precision, Recall, Confusion Matrix
+- Consistent preprocessing pipeline between training and production inference
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## API Endpoint
 
-## Learn More
+POST /predict
+Content-Type: application/json
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+{
+  "age": 32,
+  "stress_level": "high",
+  "diet": "poor",
+  ...
+}
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Response:
+{
+  "prediction": "At Risk",
+  "probability": 0.78
+}
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Running Locally
 
-### Analyzing the Bundle Size
+### Backend
+git clone https://github.com/xiaolizijun1/hairloss-backend
+cd hairloss-backend
+pip install -r requirements.txt
+python app.py
+# API running at http://localhost:5000
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Frontend
+git clone https://github.com/xiaolizijun1/hairloss-frontend
+cd hairloss-frontend
+npm install
+npm start
+# App running at http://localhost:3000
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Key Takeaways
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- End-to-end ML deployment: from notebook to production web app
+- Reproducible preprocessing pipeline ensures training/inference consistency
+- XGBoost outperformed both Decision Tree and Random Forest baselines
